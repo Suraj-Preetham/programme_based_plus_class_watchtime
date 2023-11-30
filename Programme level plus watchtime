@@ -1,5 +1,6 @@
-select up.id as programme_uid, 
-       up.name as programme_name,
+select 
+       cc.uid as course_uid, 
+       up.name as course_name,
        up.starts_at as course_start_date, 
        up.ends_at as course_end_date, 
        au.first_name || ' ' || au.last_name AS educator_name, 
@@ -11,15 +12,22 @@ left join posts_post pp on pva.video_id = pp.uid
 left join uplus_liveclass ul on pp.live_class_id = ul.id
 left join uplus_programme up on ul.programme_id = up.id
 left join uplus_programmeextradetails up2 on up.id = up2.programme_id 
+left join collection_collection cc on cc.programme_id = up.id 
 left join topology_topology tt on tt.id = up.topology_id
 left join users_userprofile uu ON pp.user_id = uu.user_id
 left join auth_user au ON uu.user_id = au.id 
 where up2.for_subscription = 1 and 
-      tt.uid in ('BIZXQ','TEWDQ')
+      tt.uid in ('BIZXQ','TEWDQ') and 
+      up.starts_at::date >= '2022-11-01'
       and pva.total_watch_time  <= 14000
       and up.state in (10,20,30,40)
       and pp.is_deleted = 0 
       and pp.is_active = 1 
       and pp.for_plus = 1 
-      and pva.updated_at::date >= '2022-11-01' and pva.updated_at::date < current_date
-group by 1,2,3,4,5 
+      and pva.updated_at::date >= '2022-11-01' and pva.updated_at::date < current_date 
+      and cc.activated_at::Date >= '2022-11-01'
+group by 1,2,3,4,5
+order by 1,2,3,4; 
+
+
+
